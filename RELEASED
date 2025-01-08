@@ -1,0 +1,44 @@
+  local Player = game:GetService("Players").LocalPlayer
+local Workspace = game:GetService("Workspace")
+local UIS = game:GetService("UserInputService")
+
+local isToggled = false  -- Variable to track whether the feature is toggled on or off
+
+-- Function to remove the "Posting" attribute for all players in Workspace.
+local function removePostingAttributes()
+    for _, otherPlayer in pairs(game:GetService("Players"):GetPlayers()) do
+        if otherPlayer ~= Player then  -- Avoid removing for yourself
+            local playerObject = Workspace:FindFirstChild(otherPlayer.Name)
+            if playerObject then
+                -- Check if the "Posting" attribute exists for this player
+                if playerObject:GetAttribute("Posting") then
+                    playerObject:SetAttribute("Posting", nil)  -- Remove the "Posting" attribute
+                    print("Removed 'Posting' attribute for " .. otherPlayer.Name)
+                end
+            end
+        end
+    end
+end
+
+-- Listen for the "P" key to toggle the removal feature on or off
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end  -- Ignore if the input is from the GUI
+
+    -- Toggle the feature when the "P" key is pressed
+    if input.KeyCode == Enum.KeyCode.Y then
+        isToggled = not isToggled  -- Toggle on/off
+
+        if isToggled then
+            print("Posting attribute removal is ON.")
+        else
+            print("Posting attribute removal is OFF.")
+        end
+    end
+end)
+
+-- Periodically check and remove "Posting" attributes if toggled on
+game:GetService("RunService").Heartbeat:Connect(function()
+    if isToggled then
+        removePostingAttributes()  -- Periodically remove attributes
+    end
+end)
